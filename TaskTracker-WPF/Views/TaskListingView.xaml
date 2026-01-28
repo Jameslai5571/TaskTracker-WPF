@@ -1,0 +1,106 @@
+﻿<UserControl x:Class="TaskTracker_WPF.Views.TaskListingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TaskTracker_WPF.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/> <!--header-->
+            <RowDefinition Height="auto"/> <!--title & button-->
+            <RowDefinition Height="auto"/> <!--task listing-->
+        </Grid.RowDefinitions>
+
+        <TextBlock 
+            Grid.Row="0"
+            Text="Task Viewer"
+            Style="{StaticResource Header}"/> <!--keyed resource-->
+
+        <Grid Grid.Row="1" Margin="0 15 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/> <!-- * = autofill -->
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock
+                Grid.Column="0"
+                FontSize="18">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="Week: {0:dd/MM} - {1:dd/MM}">
+                        <Binding Path="WeekStartDate"/>
+                        <Binding Path="WeekEndDate"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <Button
+                Grid.Column="1"
+                Content="Add Task"
+                Command="{Binding AddTaskCommand}"/>
+        </Grid>
+
+        <ListView 
+            Grid.Row="2" 
+            ItemsSource="{Binding DailyTasks}"
+            Margin="0 15 0 0">
+            <!-- data will come from this collection, the below binding will the properties of this collection-->
+            <!--DataContext="TaskListingViewModel"-->
+            <!--data context not used here because specific view model already mentioned in MainWindow.xaml
+            if still need specify, then before the ListView, add a <Window DataContext="{Binding TaskListingViewModel}"
+            if information comes from many viewmodel sources-->
+
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Date">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DayOfDate}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Completion">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    IsChecked="{Binding Path=TaskCompletion, Mode=OneTime}"
+                                    IsEnabled="False"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Task">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding TaskTitle}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Edit">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Edit" 
+                                        Command="{Binding DataContext.EditTaskCommand, 
+                                    RelativeSource={RelativeSource AncestorType=ListView}}"
+                                        CommandParameter="{Binding}"/>
+                                <!--specifying the binding with data context means, specificViewModel.EditTaskCommand, which in this case is TaskListingViewModel
+                                    the RelativeSource here helps to find where the datacontext comes from, and the ancestorType will help to locate where that information will come from
+                                    means go up the tree till you find a ListView and use its data context
+                                
+                                    this pass back the listed item as a parameter back to the command, otherwise cant access the SPECIFIC item as required (depending on scenario)
+                                in this case it would be the class "DailyTask"-->
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+
+    </Grid>
+</UserControl>
