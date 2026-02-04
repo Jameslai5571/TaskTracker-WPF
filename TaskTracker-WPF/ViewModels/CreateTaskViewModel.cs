@@ -1,8 +1,11 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using TaskTracker_WPF.Command;
 using TaskTracker_WPF.Models;
@@ -93,11 +96,29 @@ namespace TaskTracker_WPF.ViewModels
         public ICommand CreateCommand { get; }
         public ICommand CancelCommand { get; }
 
+        //======
+        private readonly ObservableCollection<SubTaskViewModel> _subTaskViewModels;
+        public IEnumerable<SubTaskViewModel> SubTasks => _subTaskViewModels;
+        public ICommand AddSubTaskCommand { get; }
+        public ICommand RemoveSubTaskCommand { get; }
+
         //getting a function to create a new TaskListingViewModel here for the create & cancel command to navigate back to the correct view
         public CreateTaskViewModel(TaskBook taskBook, NavigationService taskListingNavigationService, SaveLoadService saveLoadService, TaskIndexStore taskIndexStore)
         {
             CreateCommand = new CreateTaskCommand(this, taskBook, taskListingNavigationService, saveLoadService, taskIndexStore);
             CancelCommand = new NavigateCommand(taskListingNavigationService);
+
+            //======
+            _subTaskViewModels = new ObservableCollection<SubTaskViewModel>();
+            AddSubTaskCommand = new RelayCommand(() =>
+            {
+                _subTaskViewModels.Add(new SubTaskViewModel());
+            });
+
+            RemoveSubTaskCommand = new RelayCommand<SubTaskViewModel>(subTaskVM =>
+            {
+                _subTaskViewModels.Remove(subTaskVM);
+            });
         }
 
     }

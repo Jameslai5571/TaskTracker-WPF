@@ -52,7 +52,14 @@ namespace TaskTracker_WPF.Command
                 _createTaskViewModel.TaskDescription,
                 _createTaskViewModel.DateOfDay,
                 _createTaskViewModel.TaskCompletion);
+            
+            //====
+            foreach (SubTaskViewModel subTaskVM in this._createTaskViewModel.SubTasks)
+            {
+                dailyTask.AddSubTask(subTaskVM.SubTaskTitle, subTaskVM.SubTaskCompletion);
+            }
 
+            //====
             _taskBook.AddTask(dailyTask);
 
             _saveLoadService.SaveAsync(_taskBook);

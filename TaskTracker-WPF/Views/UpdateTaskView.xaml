@@ -8,13 +8,17 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/><!-- header -->
-            <RowDefinition Height="auto"/><!-- date -->
-            <RowDefinition Height="auto"/><!-- title -->
-            <RowDefinition Height="auto"/><!-- title descrption -->
-            <RowDefinition Height="auto"/><!-- task completion -->
-            <RowDefinition Height="auto"/><!-- buttons -->
+            <!-- header -->
+            <RowDefinition Height="auto"/>
+            <!-- content -->
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <!--left side, for task content-->
+            <ColumnDefinition Width="auto"/>
+            <!--right side, for subtask content-->
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
 
         <TextBlock
            Grid.Row="0"
@@ -22,82 +26,161 @@
            Style="{StaticResource Header}"/>
         <!--FontSize="24"-->
 
-        <Grid Grid.Row="1" Margin="0 15 0 0">
+        <Grid Grid.Column="0" Grid.Row="1">
             <Grid.RowDefinitions>
+                <!-- date -->
                 <RowDefinition Height="auto"/>
+                <!-- title -->
+                <RowDefinition Height="auto"/>
+                <!-- title descrption -->
+                <RowDefinition Height="auto"/>
+                <!-- task completion -->
+                <RowDefinition Height="auto"/>
+                <!-- buttons -->
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock 
-               Grid.Row="0"
-               Text="Date"/>
 
-            <DatePicker
-               Grid.Row="1"
-               SelectedDate="{Binding Path=DateOfDay, UpdateSourceTrigger=PropertyChanged}"
-               Width="150"
-               HorizontalAlignment="Left"
-               Margin="0 5 0 0"/>
+
+            <Grid Grid.Row="0" Margin="0 15 0 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock 
+                   Grid.Row="0"
+                   Text="Date"/>
+
+                <DatePicker
+                   Grid.Row="1"
+                   SelectedDate="{Binding Path=DateOfDay, UpdateSourceTrigger=PropertyChanged}"
+                   Width="150"
+                   HorizontalAlignment="Left"
+                   Margin="0 5 0 0"/>
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="0 10 0 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock 
+                   Grid.Row="0"
+                   Text="Title"/>
+
+                <TextBox
+                   Grid.Row="1"
+                   Text="{Binding TaskTitle, UpdateSourceTrigger=PropertyChanged}"
+                   Width="250"
+                   HorizontalAlignment="Left"
+                   Margin="0 5 0 0"/>
+            </Grid>
+
+            <Grid Grid.Row="2" Margin="0 10 0 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock
+                   Grid.Row="0"
+                   Text="Description"/>
+                <TextBox
+                   Grid.Row="1"
+                   Text="{Binding TaskDescription, UpdateSourceTrigger=PropertyChanged}"
+                   Width="400"
+                   Height="80"
+                   HorizontalAlignment="Left"
+                   Margin="0 5 0 0"/>
+            </Grid>
+
+            <Grid Grid.Row="3" Margin="0 10 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                   Grid.Column="0"
+                   Text="Completed:"/>
+                <CheckBox
+                   Grid.Column="1"
+                   Margin="10 2 0 0"
+                   IsChecked="{Binding TaskCompletion}"
+                   />
+            </Grid>
+
+            <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0 25 0 0">
+                <Button Content="Update" Command="{Binding UpdateCommand}"/>
+                <Button Content="Delete" Command="{Binding DeleteCommand}" Margin="10 0 0 0"/>
+                <Button Content="Cancel" Command="{Binding CancelCommand}" Margin="10 0 0 0"/>
+            </StackPanel>
         </Grid>
 
-        <Grid Grid.Row="2" Margin="0 10 0 0">
+        <!--right side-->
+        <Grid Grid.Column="1" Grid.Row="1" IsSharedSizeScope="True" Margin="15 0 0 0"
+              MinWidth="300">
             <Grid.RowDefinitions>
+                <!-- button -->
                 <RowDefinition Height="auto"/>
+                <!-- subtask content -->
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock 
-               Grid.Row="0"
-               Text="Title"/>
-
-            <TextBox
-               Grid.Row="1"
-               Text="{Binding TaskTitle, UpdateSourceTrigger=PropertyChanged}"
-               Width="250"
-               HorizontalAlignment="Left"
-               Margin="0 5 0 0"/>
+            <Button Grid.Row="0"
+                    Content="Add Sub-Task" 
+                    Command="{Binding AddSubTaskCommand}"
+                    HorizontalAlignment="Right" />
+            <Border BorderBrush="Black" BorderThickness="1" Grid.Row="1" MinHeight ="300" MaxHeight="300" Margin="0 5 0 0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Orientation="Vertical">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <!--button spacing-->
+                                <ColumnDefinition Width="auto" SharedSizeGroup="FirstColumn"/>
+                                <!--subtask title-->
+                                <ColumnDefinition Width="200" SharedSizeGroup="SecondColumn"/>
+                                <!--completion box-->
+                                <ColumnDefinition Width="auto" SharedSizeGroup="ThirdColumn"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="1" Text="SubTask" Margin="10 0 0 0" TextAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Text="Completion" Margin="10 0 5 0" TextAlignment="Center"/>
+                        </Grid>
+                        <StackPanel Orientation="Vertical">
+                            <ItemsControl ItemsSource="{Binding SubTasks}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0 10 0 5">
+                                            <Grid.ColumnDefinitions>
+                                                <!--delete button-->
+                                                <ColumnDefinition Width="auto" SharedSizeGroup="FirstColumn"/>
+                                                <!--subtask title-->
+                                                <ColumnDefinition Width="auto" SharedSizeGroup="SecondColumn"/>
+                                                <!--completion box-->
+                                                <ColumnDefinition Width="auto" SharedSizeGroup="ThirdColumn"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Button Grid.Column="0" 
+                                                    Content="X"
+                                                    Command="{Binding DataContext.RemoveSubTaskCommand,
+                                                            RelativeSource={RelativeSource AncestorType=StackPanel}}"
+                                                    CommandParameter="{Binding}"
+                                                    Margin="5 0 0 0"/>
+                                            <TextBox Grid.Column="1" 
+                                                     Text="{Binding SubTaskTitle}"
+                                                     Margin="10 0 0 0"/>
+                                            <CheckBox Grid.Column="2" 
+                                                      IsChecked="{Binding SubTaskCompletion}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
         </Grid>
-
-        <Grid Grid.Row="3" Margin="0 10 0 0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
-
-            <TextBlock
-               Grid.Row="0"
-               Text="Description"/>
-            <TextBox
-               Grid.Row="1"
-               Text="{Binding TaskDescription, UpdateSourceTrigger=PropertyChanged}"
-               Width="400"
-               Height="80"
-               HorizontalAlignment="Left"
-               Margin="0 5 0 0"/>
-        </Grid>
-
-        <Grid Grid.Row="4" Margin="0 10 0 0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock
-               Grid.Column="0"
-               Text="Completed:"/>
-            <CheckBox
-               Grid.Column="1"
-               Margin="10 2 0 0"
-               IsChecked="{Binding TaskCompletion}"
-               />
-        </Grid>
-
-        <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="0 25 0 0">
-            <Button Content="Update" Command="{Binding UpdateCommand}"/>
-            <Button Content="Delete" Command="{Binding DeleteCommand}" Margin="10 0 0 0"/>
-            <Button Content="Cancel" Command="{Binding CancelCommand}" Margin="10 0 0 0"/>
-        </StackPanel>
-
 
     </Grid>
 </UserControl>

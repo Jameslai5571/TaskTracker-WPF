@@ -15,19 +15,31 @@ namespace TaskTracker_WPF.Command
         private readonly NavigationService _taskViewNavigationService;
         private readonly SaveLoadService _saveLoadService;
         private readonly DailyTask _dailyTask;
+        private readonly UpdateTaskViewModel _updateTaskViewModel;
 
-        public UpdateTaskCommand(TaskBook taskBook,
+        public UpdateTaskCommand(UpdateTaskViewModel updateTaskViewModel, TaskBook taskBook,
             NavigationService taskViewNavigationService, SaveLoadService saveLoadService, DailyTask dailyTask)
         {
             _taskBook = taskBook;
             _taskViewNavigationService = taskViewNavigationService;
             _saveLoadService = saveLoadService;
             _dailyTask = dailyTask;
+            _updateTaskViewModel = updateTaskViewModel;
         }
 
 
         public override void Execute(object? parameter)
         {
+            //====
+            //clear old list
+            _dailyTask.ClearSubTaskList();
+            //add in all items into list
+            foreach (SubTaskViewModel subTaskVM in this._updateTaskViewModel.SubTasks)
+            {
+                _dailyTask.AddSubTask(subTaskVM.SubTaskIndex, subTaskVM.SubTaskTitle, subTaskVM.SubTaskCompletion);
+            }
+
+
             //perform changes & uppdate
             _taskBook.UpdateTask(_dailyTask);
 

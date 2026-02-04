@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,9 +26,19 @@ namespace TaskTracker_WPF.ViewModels
         public string DayOfDate => _dailyTask.dayOfDate.ToString("d");
         public bool TaskCompletion => _dailyTask.taskCompletion;
 
+        private readonly ObservableCollection<SubTaskViewModel> _subTaskViewModels;
+        public IEnumerable<SubTaskViewModel> SubTasks => _subTaskViewModels;
+
         public DailyTaskViewModel(DailyTask dailyTask)
         {
             _dailyTask = dailyTask;
+
+            _subTaskViewModels = new ObservableCollection<SubTaskViewModel>();
+
+            foreach (SubTask subTask in _dailyTask.GetSubTasks())
+            {
+                _subTaskViewModels.Add(new SubTaskViewModel(subTask));
+            }
         }
 
     }

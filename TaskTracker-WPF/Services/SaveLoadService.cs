@@ -62,8 +62,8 @@ namespace TaskTracker_WPF.Services
 
                 TaskBook loadTaskBook = await JsonSerializer.DeserializeAsync<TaskBook>(openStream);
                 
-                string jsonString = File.ReadAllText(_fileName);
-                TaskBook testTaskBook = JsonSerializer.Deserialize<TaskBook>(jsonString);
+                //string jsonString = File.ReadAllText(_fileName);
+                //TaskBook testTaskBook = JsonSerializer.Deserialize<TaskBook>(jsonString);
 
                 openStream.Close();
 

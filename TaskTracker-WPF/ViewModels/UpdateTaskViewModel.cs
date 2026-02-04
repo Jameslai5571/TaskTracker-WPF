@@ -1,5 +1,7 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,17 +80,39 @@ namespace TaskTracker_WPF.ViewModels
         public ICommand DeleteCommand { get; }
         public ICommand CancelCommand { get; }
 
+        private readonly ObservableCollection<SubTaskViewModel> _subTaskViewModels;
+        public IEnumerable<SubTaskViewModel> SubTasks => _subTaskViewModels;
+        public ICommand AddSubTaskCommand { get; }
+        public ICommand RemoveSubTaskCommand { get; }
+
+
         //getting a function to create a new TaskListingViewModel here for the create & cancel command to navigate back to the correct view
         public UpdateTaskViewModel(TaskBook taskBook, NavigationService taskListingNavigationService, SaveLoadService saveLoadService, DailyTask dailyTask)
         {
             _dailyTask = dailyTask;
 
-            UpdateCommand = new UpdateTaskCommand(taskBook, taskListingNavigationService, saveLoadService, _dailyTask);
+            UpdateCommand = new UpdateTaskCommand(this, taskBook, taskListingNavigationService, saveLoadService, _dailyTask);
             DeleteCommand = new DeleteTaskCommand(taskBook, taskListingNavigationService, saveLoadService, _dailyTask);
             CancelCommand = new NavigateCommand(taskListingNavigationService);
+
+            //==
+            _subTaskViewModels = new ObservableCollection<SubTaskViewModel>();
+
+            foreach(SubTask subTask in _dailyTask.GetSubTasks())
+            {
+                _subTaskViewModels.Add(new SubTaskViewModel(subTask));
+            }
+
+
+            AddSubTaskCommand = new RelayCommand(() =>
+            {
+                _subTaskViewModels.Add(new SubTaskViewModel());
+            });
+
+            RemoveSubTaskCommand = new RelayCommand<SubTaskViewModel>(subTaskVM =>
+            {
+                _subTaskViewModels.Remove(subTaskVM);
+            });
         }
-
-
-
     }
 }

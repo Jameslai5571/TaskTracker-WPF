@@ -3,24 +3,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace TaskTracker_WPF.Models
 {
     internal class DailyTask
     {
-        //temp removal, once the overall app comes together, will add in future
-        //private List<SubTask> _subTasks;
-
         public int taskIndex { get; set; }
         public string taskTitle { get; set; }
         public string taskDescription { get; set; }
         public DateTime dayOfDate { get; set; }
         public bool taskCompletion { get; set; }
 
+        [JsonInclude]
+        private List<SubTask> _subTaskList;
+
         public DailyTask(int taskIndex, string taskTitle, string taskDescription, DateTime dayOfDate, bool taskCompletion)
         {
-            //_subTasks = new List<SubTask>();
+            _subTaskList = new List<SubTask>();
             this.taskIndex = taskIndex;
             this.taskTitle = taskTitle;
             this.taskDescription = taskDescription;
@@ -28,23 +29,66 @@ namespace TaskTracker_WPF.Models
             this.taskCompletion = taskCompletion;
         }
 
-        public void UpdateTaskCompletion()
+        //for actual add new subtask
+        public void AddSubTask(string subTaskTitle, bool subTaskCompletion)
         {
-            this.taskCompletion = !taskCompletion;
+            _subTaskList.Add(new SubTask(GetIncrementalSubTaskIndex(), subTaskTitle, subTaskCompletion));
+        }
+        //for pre-existing subtask <-> subtaskviewmodel
+        public void AddSubTask(int subTaskIndex, string subTaskTitle, bool subTaskCompletion)
+        {
+            _subTaskList.Add(new SubTask(subTaskIndex, subTaskTitle, subTaskCompletion));
         }
 
-        public void UpdateTaskInfo(string taskTitle, string taskDescription, DateTime dayOfDate, bool taskCompletion)
+        public void UpdateSubTask(SubTask subTask)
         {
-            this.taskTitle = taskTitle;
-            this.taskDescription = taskDescription;
-            this.dayOfDate = dayOfDate;
-            this.taskCompletion = taskCompletion;
+            int _subTaskIndex = _subTaskList.FindIndex(sub =>
+            {
+                return sub.subTaskIndex.Equals(subTask.subTaskIndex);
+            });
+
+            if (_subTaskIndex != -1)
+            {
+                _subTaskList[_subTaskIndex] = subTask;
+            }
         }
 
-        //public void AddSubTask(string subTaskTitle, string subTaskDescription)
-        //{
-        //    _subTasks.Add(new SubTask(subTaskTitle, subTaskDescription, false));
-        //}
+        public void RemoveSubTask(SubTask subTask)
+        {
+            int _subTaskIndex = _subTaskList.FindIndex(sub =>
+            {
+                return sub.subTaskIndex.Equals(subTask.subTaskIndex);
+            });
+
+            if (_subTaskIndex != -1)
+            {
+                _subTaskList.RemoveAt(_subTaskIndex);
+            }
+        }
+
+        private int GetIncrementalSubTaskIndex()
+        {
+            int subIndex = 0;
+
+            //get last item on the list and increment that index by 1
+            if (_subTaskList.Count != 0)
+            {
+               subIndex = _subTaskList[_subTaskList.Count - 1].subTaskIndex + 1;
+            }
+            //if no item in list, remain as 0 = first item on list
+
+            return subIndex;
+        }
+
+        public List<SubTask> GetSubTasks()
+        {
+            return _subTaskList;
+        }
+
+        public void ClearSubTaskList()
+        {
+            _subTaskList.Clear();
+        }
 
     }
 }

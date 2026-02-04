@@ -57,6 +57,11 @@ namespace TaskTracker_WPF.ViewModels
                     DateTime.Parse(dailyTaskViewModel.DayOfDate),
                     dailyTaskViewModel.TaskCompletion);
 
+                foreach (SubTaskViewModel subTaskVM in dailyTaskViewModel.SubTasks)
+                {
+                    dailyTask.AddSubTask(subTaskVM.SubTaskIndex, subTaskVM.SubTaskTitle, subTaskVM.SubTaskCompletion);
+                }
+
                 new NavigateCommand(updateTaskListingNavigationService, dailyTask).Execute(dailyTask);
             });
 
